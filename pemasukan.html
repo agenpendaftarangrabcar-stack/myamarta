@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>DATA PEMASUKAN CA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f5f5f5;
+      padding: 40px 20px;
+    }
+    h1 {
+      color: #00796b;
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      max-width: 1000px;
+      margin: 30px auto;
+      border-collapse: collapse;
+      background-color: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 16px 12px;
+      border: 1px solid #ddd;
+      vertical-align: middle;
+    }
+    th {
+      background-color: #009688;
+      color: white;
+      font-size: 15px;
+      text-align: center;
+    }
+    td {
+      font-size: 16px;
+      white-space: nowrap;
+    }
+
+    /* Kolom teks rata kiri */
+    td.keterangan {
+      text-align: left;
+    }
+
+    /* Kolom angka rata kanan */
+    td.angka {
+      text-align: right;
+    }
+
+    .back {
+      display: block;
+      width: fit-content;
+      margin: 40px auto 0;
+      padding: 10px 18px;
+      background-color: #ccc;
+      color: #333;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      text-align: center;
+    }
+    .back:hover {
+      background-color: #999;
+    }
+
+    .loading {
+      text-align: center;
+      color: #666;
+      font-style: italic;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📥 <span style="color: teal;">DATA PEMASUKAN CA</span></h1>
+
+  <div class="loading" id="loading">Loading Dulu Boss...</div>
+
+  <table id="pemasukanTable" style="display:none;">
+    <thead>
+      <tr>
+        <th>SISA SALDO UPDATE</th>
+        <th>PEMASUKAN</th>
+        <th>KETERANGAN</th>
+        <th>PENGELUARAN</th>
+        <th>KETERANGAN</th>
+        <th>SISA SALDO</th>
+        <th>DANA LEBIH</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <a href="data.html" class="back">← Kembali ke Data</a>
+
+  <script>
+    const apiUrl = "https://script.google.com/macros/s/AKfycbycybM9KCMPT-TBkwsgt9EPL2R2rAeDk5xr3eKzMj1dbbeKAbFRJb-BP58AiSwoOwby/exec?action=pemasukan";
+
+    function formatRupiah(angka) {
+      if (!angka || angka === "-") return "-";
+      let strAngka = angka.toString().replace(/[^\d]/g, "");
+      let number = parseInt(strAngka);
+      if (isNaN(number)) return angka;
+      return "Rp " + number.toLocaleString("id-ID");
+    }
+
+    fetch(apiUrl)
+      .then(res => res.json())
+      .then(json => {
+        const table = document.getElementById("pemasukanTable");
+        const tbody = table.querySelector("tbody");
+        const loading = document.getElementById("loading");
+
+        if (json.success && json.data.length > 0) {
+          json.data.forEach(item => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td class="angka">${formatRupiah(item.SISA_SALDO_UPDATE)}</td>
+              <td class="angka">${formatRupiah(item.PEMASUKAN)}</td>
+              <td class="keterangan">${item.KETERANGAN_1 || '-'}</td>
+              <td class="angka">${formatRupiah(item.PENGELUARAN)}</td>
+              <td class="keterangan">${item.KETERANGAN_2 || '-'}</td>
+              <td class="angka">${formatRupiah(item.SISA_SALDO)}</td>
+              <td class="angka">${formatRupiah(item.DANA_LEBIH)}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+          table.style.display = "table";
+          loading.style.display = "none";
+        } else {
+          loading.innerText = "Data pemasukan tidak tersedia.";
+        }
+      })
+      .catch(err => {
+        document.getElementById("loading").innerText = "Gagal memuat data.";
+        console.error(err);
+      });
+  </script>
+
+</body>
+</html>

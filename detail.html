@@ -1,0 +1,18 @@
+<script>
+  // buat datalist di input.html dari localStorage (jika tersedia)
+  (function(){
+    try {
+      const daftar = JSON.parse(localStorage.getItem('daftarRumah') || '[]');
+      if (Array.isArray(daftar) && daftar.length > 0) {
+        let dl = document.getElementById('daftarRumah');
+        if (!dl) {
+          dl = document.createElement('datalist');
+          dl.id = 'daftarRumah';
+          document.body.appendChild(dl);
+        }
+        dl.innerHTML = daftar.map(v => `<option value="${v}">`).join('');
+        // pastikan input di input.html pake: <input list="daftarRumah" id="rumah" ...>
+      }
+    } catch(e) { console.warn(e); }
+  })();
+</script>
